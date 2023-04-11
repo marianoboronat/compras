@@ -3,7 +3,7 @@ from tkinter import ttk
 import widgets
 
 from docxtpl import DocxTemplate
-
+import datetime
 
 class BlockButton:
     def __init__(self, parent, fila, columna, entrada=None):
@@ -29,8 +29,13 @@ class BlockButton:
 
 class MainWindow:
     def __init__(self, parent):
+        # parameters
         self.parent = parent
 
+        #propierties
+        # get current date
+        self.date_current = datetime.datetime.now()
+        self.current_year = self.date_current.year
 
         self.frame = tk.Frame(self.parent)
         self.frame.pack()
@@ -43,16 +48,14 @@ class MainWindow:
 
 
         # widgets        
-        self.ley = widgets.TagsAndEntry(self.main_frame,"Ley",5,0)
-        self.ley.data.set("6.588")
-        self.ley_bloc = BlockButton(self.main_frame, 5,3,self.ley)
+        self.ley = widgets.TagsAndEntryBlock(self.main_frame,"Ley", 0,0, 1)
+        self.ley.data.set(widgets.open_parameter("ley"))
 
-        self.anio = widgets.TagsAndEntry(self.main_frame,"Año",10,0)
-        self.anio.data.set("2023")
-        self.anio_bloc = BlockButton(self.main_frame, 10,3,self.anio)
+        self.anio = widgets.TagsAndEntryBlock(self.main_frame,"Año", 10,0, 1)
+        self.anio.data.set(self.current_year)
 
         self.detalle = widgets.TagsAndEntry(self.main_frame,"detalle",20,0)
-        # self.detalle.entry.config()
+        self.detalle.entry.config(width=35)
         self.expediente_electronico = widgets.TagsAndEntry(self.main_frame,"Expediente Electrónico",30,0)
         self.numero_proceso = widgets.TagsAndEntry(self.main_frame,"N° de Proceso",40,0) 
         self.solicitud_gasto = widgets.TagsAndEntry(self.main_frame,"Solicitud de Gasto",50,0)
@@ -61,9 +64,13 @@ class MainWindow:
         self.precio_a_letras = widgets.TagsAndEntry(self.main_frame,"Precio en letras",70,0)
         self.fecha_recepcion = widgets.FechaDividido(self.main_frame, "Fecha de Recepcion", 80,0)
         self.fecha_recepcion.frame_main.grid(columnspan = 3)
-        self.submit = ttk.Button(self.main_frame, cursor = "hand2", text = "Crear Dispocicion Llamado",
+        self.submit = ttk.Button(self.main_frame, cursor = "hand2", text = "GENERAR DISPOSICION DE LLAMADO",
                                      command = self.get_data)
         self.submit.grid(column = 0, row = 99, columnspan = 3)
+
+        self.cleaner = ttk.Button(self.main_frame, cursor = "hand2", text = "Limpiar",
+                                     command = self.clean)
+        self.cleaner.grid(column = 0, row = 100, columnspan = 3)
 
 
         self.context = {
@@ -85,6 +92,18 @@ class MainWindow:
 
             }
 
+    def clean(self):
+        print("limpiar entradas")
+        self.detalle.data.set("")
+        self.expediente_electronico.data.set("")
+        self.numero_proceso.data.set("")
+        self.solicitud_gasto.data.set("")
+        self.numero_pliego.data.set("")
+        self.precio.data.set("")
+        self.precio_a_letras.data.set("")
+        self.fecha_recepcion.data_day.set("")
+        self.fecha_recepcion.data_month.set("")
+        self.fecha_recepcion.data_year.set("")
 
     def get_data(self):
         self.context["ley"] = self.ley.get()

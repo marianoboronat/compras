@@ -6,6 +6,7 @@ from docx import Document
 from docx.enum.style import WD_STYLE_TYPE
 from docx.shared import Pt, RGBColor
 
+import datetime
 from docxtpl import DocxTemplate
 import widgets
 
@@ -15,21 +16,27 @@ class Main:
         #parameters
         self.parent = parent
 
+        #propierties
+        # get current date
+        self.date_current = datetime.datetime.now()
+        self.current_year = self.date_current.year
+
         self.frame = tk.Frame(self.parent)
         self.frame.pack(fill = "both", expand = 1)
         self.config = widgets.ConfigFrame(self.frame)
         self.main_frame = ttk.LabelFrame(self.frame, text ="Generar Publicación", padding = 10)
         self.main_frame.pack(fill = "x", padx = 7, pady = 7)    
 
-        self.firmante = widgets.TagsAndEntryBlock(self.main_frame, "Firmante", 0, 0)
-        self.firma_rol = widgets.TagsAndEntryBlock(self.main_frame, "Firma rol", 3, 0)
-        self.firmante.disabled()
-        self.firma_rol.disabled()
-        self.detalle = widgets.TagsAndEntry(self.main_frame, "Detalle", 5, 0)
+        self.anio = widgets.TagsAndEntryBlock(self.main_frame, "Año", 10, 0, True)
+        self.anio.data.set(self.current_year)
+
+        self.firmante = widgets.TagsAndEntryBlock(self.main_frame, "Firmante",15, 0, True)
+        self.firma_rol = widgets.TagsAndEntryBlock(self.main_frame, "Firma rol", 20, 0, True)
+
+        self.detalle = widgets.TagsAndEntry(self.main_frame, "Detalle", 25, 0)
         self.detalle.entry.config(width=35)
-        self.proceso = widgets.TagsAndEntry(self.main_frame, "N° Proceso", 10, 0)
-        self.anio = widgets.TagsAndEntry(self.main_frame, "Año", 20, 0)
-        self.numero_expediente = widgets.TagsAndEntry(self.main_frame, "N° Expediente",30, 0)
+        self.proceso = widgets.TagsAndEntry(self.main_frame, "N° Proceso", 30, 0)
+        self.numero_expediente = widgets.TagsAndEntry(self.main_frame, "N° Expediente",35, 0)
         self.fecha_apertura = widgets.TagsAndEntry(self.main_frame, "Fecha de Apertura",40, 0)
         self.numero_disposicion = widgets.TagsAndEntry(self.main_frame, "Numero disposicion",50, 0)
         self.fecha_consulta = widgets.FechaDividido(self.main_frame, "Fecha consulta(mes en letras)",60,0)
@@ -38,7 +45,10 @@ class Main:
 
         self.submit_button = ttk.Button(self.main_frame, text = "GENERAR PUBLICACION", command=self.get_data)
         self.submit_button.grid(columnspan=3)
-        
+
+        self.cleaner = ttk.Button(self.main_frame, cursor = "hand2", text = "Limpiar",
+                                command = self.clean)
+        self.cleaner.grid(column = 0, row = 100, columnspan = 3)
 
         self.context = {
             "anio":None,
@@ -55,6 +65,16 @@ class Main:
             "firmante":None,
             "firma_rol":None
         }
+
+    def clean(self):
+        self.detalle.data.set("")
+        self.proceso.data.set("")
+        self.numero_expediente.data.set("")
+        self.fecha_apertura.data.set("")
+        self.numero_disposicion.data.set("")
+        self.fecha_consulta.data_day.set("")
+        self.fecha_consulta.data_month.set("")
+        self.fecha_consulta.data_year.set("")
 
     def get_data(self):
         self.context["anio"]=self.anio.get(),

@@ -32,9 +32,10 @@ class Main:
 
 
         # widgets
-        self.ley = widgets.TagsAndEntry(self.main_frame, "Ley (con punto)",5,0)
-        self.ley.data.set("6.588")
-        self.anio = widgets.TagsAndEntry(self.main_frame, "Año",10,0)
+        
+        self.ley = widgets.TagsAndEntryBlock(self.main_frame, "Ley (con punto)",5,0, True)
+        self.ley.data.set(f"{widgets.open_parameter('ley')}")
+        self.anio = widgets.TagsAndEntryBlock(self.main_frame, "Año",10,0, True)
         self.anio.data.set(self.current_year)
         self.detalle = widgets.TagsAndEntry(self.main_frame, "Detalle",20,0, True)
         self.detalle.entry.config(width =  30, font = "Arial 14")
@@ -49,8 +50,10 @@ class Main:
 
 
         self.submit_button = ttk.Button(self.main_frame, text = "GENERAR PLIEGO", command=self.get_data)
-        self.submit_button.grid(columnspan=3)
-        
+        self.submit_button.grid(columnspan=3)        
+        self.cleaner = ttk.Button(self.main_frame, cursor = "hand2", text = "Limpiar",
+                                command = self.clean)
+        self.cleaner.grid(column = 0, row = 100, columnspan = 3)
 
         self.context = {
             "template_file":None, #nombre del archivo de la plantilla
@@ -69,6 +72,8 @@ class Main:
             "tipo_de_dias":None
         }
 
+    def clean(self):
+        pass
     def get_data(self):        
         self.context["contratacion"] = self.get_contratacion()
         self.context["ley"] = self.ley.get()

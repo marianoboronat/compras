@@ -120,5 +120,6 @@ class HideShowButton:
 if __name__ == "__main__":
     root = tk.Tk()
     datos = Arbol(root)
+    root.title("Compras")
     # root.state("zoomed")
     root.mainloop()

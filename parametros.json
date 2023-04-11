@@ -1,21 +1,9 @@
 {
     "parametros": {
         "ley": "6.588",
-        "file_template": "",
+        "file_template": "C:/Users/mariano/Downloads",
         "path_output": "",
-        "director": "Juan Jos\u00c3\u00a9 Camusso",
-        "sub_director": "",
-        "especificaciones_tecnicas": null,
-        "contratacion": null,
-        "contratacion_mayusc": null,
-        "codigo_contratacion": null,
-        "numero_articulo": null,
-        "anio": null,
-        "anio_dos_cifras": null,
-        "detalle": null,
-        "detalle_mayuscula": null,
-        "dias_entrega": null,
-        "dias_entrega_letra": null,
-        "tipo_de_dias": null
+        "firmante": "Juan Jos\u00c3\u00a9 Camusso",
+        "particion_firmante": ""
     }
 }

@@ -12,7 +12,9 @@ def open_json(file):
     with open(file) as json_file: #ABRIR EL ARCHIVO	
         main_objeto = json.load(json_file) #LA VARIABLE 'datos' ABRE EL OBJETO JSON DEL ARCHIVO 'json_file'
         return main_objeto
-    
+def open_parameter( parameter):
+    return open_json("parametros.json")["parametros"][f"{parameter}"]
+
 def save_json(file,parametro, valor): #1er. ARG: EL NOMBRE DE ARCHIVO, 2do ARG: EL DATO QUE ABRE EL OBJETO PARA AGREGAR DATOS
     """escribe datos en el archivo json que se le asigne."""
     data = open_json(file)
@@ -67,8 +69,10 @@ class FechaDividido:
 
         self.frame_main = tk.Frame(self.parent)
         self.frame_main.grid(row = self._row, column = self._column)
-        self.fecha_consulta_label = tk.Label(self.frame_main, text = self.texto, font = NORMAL_FONT)
-        self.fecha_consulta_label.pack(side = "left", pady = 5, padx = 5)
+        self.fecha_consulta_label = tk.Label(self.frame_main,cursor="hand2", text = self.texto, font = NORMAL_FONT)
+        self.fecha_consulta_label.pack(side = "left", pady = 5, padx = 5)        
+        self.fecha_consulta_label.bind("<Button-1>", self.focus_entry)
+
         self.dia_consultas = ttk.Entry(self.frame_main, width=3, font = NORMAL_FONT, textvariable=self.data_day)
         self.dia_consultas.pack(side = "left", pady = 5, padx = 5)
         self.dia_consultas.bind('<Return>', self.button_tab )
@@ -82,8 +86,12 @@ class FechaDividido:
         self.anio_consultas = ttk.Entry(self.frame_main, width=6, font = NORMAL_FONT, textvariable=self.data_year)
         self.anio_consultas.pack(side = "left", pady = 5, padx = 5)
         self.anio_consultas.bind('<Return>', self.button_tab )
-        
+    
+    # events
+    def focus_entry(self,event):
+        self.dia_consultas.focus()
 
+    # methods
     def button_tab(self, event):    
         self.parent.event_generate('<Tab>')
     
@@ -273,13 +281,14 @@ class TagsAndEntry:
         self.entry.config(state= "enabled")
 
 class TagsAndEntryBlock(TagsAndEntry):
-    def __init__(self, parent, text_, row_, column_ ):
+    def __init__(self, parent, text_, row_, column_ , block = False):
         TagsAndEntry.__init__(self,parent, text_, row_, column_)
+        self.block = block
+        
 
-        self.block_button = tk.Button(self.parent, text ="block", command=self.block_entry)
+        self.block_button = ttk.Button(self.parent, text ="block",cursor="hand2", command=self.block_entry)
         self.block_button.grid(column = column_+2,row = row_)
-    
-        self.block = False
+
         self.block_entry()
 
     def block_entry(self):
@@ -312,7 +321,6 @@ class PathSelector(TagsAndEntry):
         
         self.data.set(open_json("parametros.json")["parametros"][self.parametro])
 
-
 class FileSelector(TagsAndEntry):
     def __init__(self, parent, text_, row_, column_, parametro ):
         self.parametro = parametro
@@ -332,7 +340,6 @@ class FileSelector(TagsAndEntry):
         save_json("parametros.json",f"{parametro}",f"{self.directory}")
         
         self.data.set(open_json("parametros.json")["parametros"][self.parametro])
-
 
 class TagsAndOptions:
     """ genera una etiqueta y un combobox para los formularios"""
@@ -451,5 +458,5 @@ class TagsAndChecks:
 
 if __name__ == '__main__':    
     # MAIN VENTANA
-    save_json("parametros.json", "nombre","mariano")
+    print(open_parameter("file_template"))
 
