@@ -87,7 +87,6 @@ class EmpresaFrame:
             self.arbol_de_prueba.write_rows(self.lista_valores)
             self.clean()
         
-
 class Main:
     def __init__(self, parent):
         #parameters
@@ -99,13 +98,7 @@ class Main:
         # self.frame = tk.Frame(self.parent)
         # self.frame.pack(fill = "both", expand=1)
 
-        
-
-
-
-
 if __name__== "__main__":
     root = tk.Tk()
     ventana = Main(root)
-    
     root.mainloop()

@@ -57,10 +57,7 @@ class Main:
 
         self.context = {
             "template_file":None, #nombre del archivo de la plantilla
-            "especificaciones_tecnicas":None, #"B – ESPECIFICACIONES TÉCNICAS"
-            "contratacion":None,
-            "contratacion_mayusc":None, 
-            "codigo_contratacion":None, #ej: CME
+            "especificaciones_tecnicas":"", #"B – ESPECIFICACIONES TÉCNICAS"
             "numero_articulo":None,#segun el tipo de contratacion
             "ley":None,
             "anio":None,
@@ -74,8 +71,7 @@ class Main:
 
     def clean(self):
         pass
-    def get_data(self):        
-        self.context["contratacion"] = self.get_contratacion()
+    def get_data(self):
         self.context["ley"] = self.ley.get()
         self.context["anio"] = self.anio.get()
         self.context["anio_dos_cifras"] = self.anio.get()[2:]
@@ -83,17 +79,17 @@ class Main:
         self.context["detalle_mayuscula"] = self.detalle.get().upper()
         self.context["dias_entrega"] = self.dias_entrega.get()
         self.context["dias_entrega_letra"] = self.dias_entrega_letras.get().upper()
-        self.get_contratacion()
-        self.get_tipo_dia()
+        self.get_tipo_dia() 
         self.get_especificaciones_tecnicas()
         
         self.generate_file()
     
+
     def get_especificaciones_tecnicas(self):
         esp_tecnica = self.especificaciones_tecnicas.get()
+        print(esp_tecnica)
         if esp_tecnica == 1:
-            self.context["especificaciones_tecnicas"] = ""
-            
+            self.context["especificaciones_tecnicas"] = ""            
         elif esp_tecnica == 2:
             self.context["especificaciones_tecnicas"] = "B. ESPECIFICACIONES TÉCNICAS"
 
@@ -107,32 +103,19 @@ class Main:
             self.context["tipo_de_dias"] = "corridos"
 
 
-    def get_contratacion(self):
-        contratacion = self.options_contrataciones.get()
-        if contratacion == 1:
-            self.context["template_file"] = "PLIEGO_CME.docx"
-            self.context["contratacion"] = "Contratación Menor"
-            self.context["contratacion_mayusc"] = self.context["contratacion"].upper()
-            self.context["codigo_contratacion"] = "CME"
-            self.context["numero_articulo"] = "38"
-        elif contratacion == 2:
-            self.context["template_file"] = "PLIEGO_CDI.docx"
-            self.context["contratacion"] = "Contratación Directa"
-            self.context["contratacion_mayusc"] = self.context["contratacion"].upper()
-            self.context["codigo_contratacion"] = "CDI"
-            self.context["numero_articulo"] = "28"
 
-        print(contratacion)
 
 
     def generate_file(self):
         try:
-            document = DocxTemplate(f"templates/{self.context['template_file']}")
+            document = DocxTemplate(f"templates/PLIEGO_CME.docx")
             document.render(self.context)
-            document.save(f"PLIEGO{self.context['codigo_contratacion']}{self.context['detalle']}.docx")
-            self.info.info("Documento creado satisfactoriamente")
+            name_path = f"{widgets.open_parameter('path_output')}"
+            name_document = f"PLIEGO455CME{self.context['detalle']}.docx"
+            document.save(f"{name_path}/{name_document}")
+            self.info.success(f"El documento '{name_document}' fue creado con exito\nen la carpeta {name_path}")
         except: 
-            self.info.warning("Error")
+            self.info.warning("Error: Hubo un Error al intentar crear el archivo")
 
 
 

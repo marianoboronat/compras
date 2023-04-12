@@ -39,7 +39,8 @@ class MainWindow:
 
         self.frame = tk.Frame(self.parent)
         self.frame.pack()
-
+        
+        self.info = widgets.InfoFrame(self.frame)
         self.config = widgets.ConfigFrame(self.frame)
 
         self.main_frame = ttk.LabelFrame(self.frame, text = "Generar Disposicion de llamado", padding=10 )
@@ -47,7 +48,7 @@ class MainWindow:
 
 
 
-        # widgets        
+        # widgets
         self.ley = widgets.TagsAndEntryBlock(self.main_frame,"Ley", 0,0, 1)
         self.ley.data.set(widgets.open_parameter("ley"))
 
@@ -125,10 +126,15 @@ class MainWindow:
         self.create_document()
 
     def create_document(self):
-        document = DocxTemplate("templates/DISPOLLAMADO_CME.docx")
-        document.render(self.context)
-        document.save(f"DISPOSICIONLLAMADO-455-{self.context['numero_proceso']}-CME{self.context['anio_dos_cifras']}.docx")
-
+        try: 
+            document = DocxTemplate("templates/DISPOLLAMADO_CME.docx")
+            document.render(self.context)            
+            name_path = f"{widgets.open_parameter('path_output')}"
+            name_document = f"DISPOSICIONLLAMADO455{self.context['numero_proceso']}CME{self.context['anio_dos_cifras']}.docx"
+            document.save(f"{name_path}/{name_document}")
+            self.info.success(f"El documento '{name_document}' fue creado con exito\nen la carpeta {name_path}")
+        except: 
+            self.info.warning("Error: Hubo un Error al intentar crear el archivo")
 
 if __name__ == "__main__":
     root = tk.Tk()

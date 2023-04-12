@@ -21,8 +21,11 @@ class Main:
         self.date_current = datetime.datetime.now()
         self.current_year = self.date_current.year
 
+
         self.frame = tk.Frame(self.parent)
         self.frame.pack(fill = "both", expand = 1)
+        
+        self.info = widgets.InfoFrame(self.frame)
         self.config = widgets.ConfigFrame(self.frame)
         self.main_frame = ttk.LabelFrame(self.frame, text ="Generar Publicación", padding = 10)
         self.main_frame.pack(fill = "x", padx = 7, pady = 7)    
@@ -41,7 +44,7 @@ class Main:
         self.numero_disposicion = widgets.TagsAndEntry(self.main_frame, "Numero disposicion",50, 0)
         self.fecha_consulta = widgets.FechaDividido(self.main_frame, "Fecha consulta(mes en letras)",60,0)
         self.fecha_consulta.frame_main.grid(columnspan=3)
-        self.fecha_inicio_vencimiento = widgets.TagsAndEntry(self.main_frame, "Fecha Inicio y Vencimiento",70,0)
+        self.fecha_inicio_vencimiento = widgets.TagsAndEntry(self.main_frame, "Fecha Inicio y Vencimiento\n(dd/mm/aa)",70,0)
 
         self.submit_button = ttk.Button(self.main_frame, text = "GENERAR PUBLICACION", command=self.get_data)
         self.submit_button.grid(columnspan=3)
@@ -99,9 +102,16 @@ class Main:
 
     
     def generate_file(self):
-        document = DocxTemplate("templates/PUBLICACION.docx")
-        document.render(self.context)
-        document.save(f"PUBLICACION455{self.context['proceso']}CME{self.context['anio_dos_cifras']}.docx")
+        try:
+            document = DocxTemplate("templates/PUBLICACION.docx")
+            document.render(self.context)
+            name_path = f"{widgets.open_parameter('path_output')}"
+            name_document = f"PUBLICACION455{self.context['proceso']}CME{self.context['anio_dos_cifras']}.docx"
+            document.save(f"{name_path}/{name_document}")
+            self.info.success(f"El documento '{name_document}' fue creado con exito\nen la carpeta {name_path}")
+        
+        except: 
+            self.info.warning("Error: Hubo un Error al intentar crear el archivo")
 
 
 if __name__== "__main__":

@@ -8,7 +8,7 @@ import datetime
 NORMAL_FONT = "Calibri 14"
 
 def open_json(file):
-    """abre los archivos json para su lectura""" 
+    """abre los archivos json para su lectura"""
     with open(file) as json_file: #ABRIR EL ARCHIVO	
         main_objeto = json.load(json_file) #LA VARIABLE 'datos' ABRE EL OBJETO JSON DEL ARCHIVO 'json_file'
         return main_objeto
@@ -35,13 +35,16 @@ class InfoFrame:
 
     def warning(self, texto):
         print(f"Peligro: {texto}")
-        self.frame.config(bg = "red")
-        self.label.config(bg = "red", fg= "white", text =texto)
-
+        self.frame.config(bg = "#CA6161")
+        self.label.config(bg = "#CA6161", fg= "white", text =texto)
+    def success (self, texto):
+        print("")        
+        self.frame.config(bg = "#44C190")
+        self.label.config(bg = "#44C190", fg= "white", text =texto)
     def info(self, texto):
         print(f"Info: {texto}")
-        self.frame.config(bg = "green")
-        self.label.config(bg = "green", fg= "white", text =texto)
+        self.frame.config(bg = "#CDCDCD")
+        self.label.config(bg = "#CDCDCD", fg= "black", text =texto)
 
 class ConfigFrame:
     def __init__(self, parent):
@@ -51,8 +54,8 @@ class ConfigFrame:
         self.frame = ttk.LabelFrame(self.parent, text ="Config ", padding = 10)
         self.frame.pack(fill = "x", padx = 5, pady = 5)
 
-        self.file_template = PathSelector(self.frame, "Plantilla", 10, 0, "file_template")
-        self.file_output = PathSelector(self.frame, "Archivo Salida", 20, 0, "path_output")
+        # self.file_template = PathSelector(self.frame, "Plantilla", 10, 0, "file_template")
+        self.file_output = PathSelector(self.frame, "Destino del archivo", 20, 0, "path_output")
 
 class FechaDividido:
     def __init__(self, parent, texto, _row, _column ):
