@@ -245,7 +245,7 @@ class TagsAndEntry:
         self.data = tk.StringVar()
 
         # widgets
-        self.label = ttk.Label(self.parent, text = self.text_.capitalize(),cursor="hand2", font = NORMAL_FONT)
+        self.label = ttk.Label(self.parent, text = self.text_+":",cursor="hand2", font = NORMAL_FONT)
         self.label.grid(row = self.row_, column = self.column_)
         self.label.bind("<Button-1>", self.focus_entry)
 
