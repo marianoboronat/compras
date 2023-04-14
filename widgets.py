@@ -57,6 +57,9 @@ class ConfigFrame:
         # self.file_template = PathSelector(self.frame, "Plantilla", 10, 0, "file_template")
         self.file_output = PathSelector(self.frame, "Destino del archivo", 20, 0, "path_output")
 
+
+
+
 class FechaDividido:
     def __init__(self, parent, texto, _row, _column ):
         
@@ -245,12 +248,12 @@ class TagsAndEntry:
         self.data = tk.StringVar()
 
         # widgets
-        self.label = ttk.Label(self.parent, text = self.text_+":",cursor="hand2", font = NORMAL_FONT)
-        self.label.grid(row = self.row_, column = self.column_)
+        self.label = ttk.Label(self.parent, text = self.text_+": ",cursor="hand2", font = NORMAL_FONT)
+        self.label.grid(row = self.row_, column = self.column_, sticky="e")
         self.label.bind("<Button-1>", self.focus_entry)
 
         self.entry = ttk.Entry(self.parent, width = 23,font = NORMAL_FONT, textvariable = self.data)
-        self.entry.grid(row = self.row_, column = self.column_ + 1, pady = 3)
+        self.entry.grid(row = self.row_, column = self.column_ + 1, pady = 3, sticky="w")
         self.entry.bind('<Return>', self.button_tab )
         self.entry.bind("<Control-BackSpace>",self.cleaner)
         
@@ -288,9 +291,8 @@ class TagsAndEntryBlock(TagsAndEntry):
         TagsAndEntry.__init__(self,parent, text_, row_, column_)
         self.block = block
         
-
         self.block_button = ttk.Button(self.parent, text ="block",cursor="hand2", command=self.block_entry)
-        self.block_button.grid(column = column_+2,row = row_)
+        self.block_button.grid(column = column_+2,row = row_, sticky="w")
 
         self.block_entry()
 
@@ -461,5 +463,5 @@ class TagsAndChecks:
 
 if __name__ == '__main__':    
     # MAIN VENTANA
-    print(open_parameter("file_template"))
-
+    root = tk.Tk()
+    root.mainloop()

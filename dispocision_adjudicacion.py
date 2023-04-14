@@ -7,46 +7,8 @@ from docx.enum.style import WD_STYLE_TYPE
 from docx.shared import Pt, RGBColor
 
 from docxtpl import DocxTemplate
-import widgets, tree
+import widgets, tree, data_base as db
 
-class RenglonFrame:
-    def __init__(self, parent):
-        #parameters
-        self.parent = parent
-        self.texto =  "Registrar Renglon"
-
-        self.frame = tk.LabelFrame(self.parent, text = self.texto, font ="Calibri 16 bold")
-        self.frame.pack(fill = "x", padx = 5, pady =5)
-        #properties
-        
-        # lista de valores
-        self.lista_valores = []
-
-        self.nombre_renglon = widgets.TagsAndEntry(self.frame,"nombre del renglon",0, 0)
-        # self.cuit_empresa =widgets.TagsAndEntry(self.frame,"CUIT (con guiones)",10, 0)
-        self.register = ttk.Button(self.frame, text ="Registrar empresa", command= self.add_data)
-        self.register.grid(row = 50,column = 0, columnspan=2, pady = 5, padx = 5)
-        self.register.bind("<Return>",lambda x: self.add_data())
-        
-        self.arbol_de_prueba = tree.TreeviewData(self.parent)
-        self.arbol_de_prueba.head(["EMPRESA", "CUIT"])
-        # self.arbol_de_prueba.write_rows([["empresa_1","cuit_1", "renglon_"], ["empresa_2", "cuit_2", "renglon_2"]])
-
-    def clean(self):
-        self.nombre_empresa.data.set("")
-        self.cuit_empresa.data.set("")        
-        self.nombre_empresa.entry.focus()
-
-    def add_data(self):
-        get_empresa = self.nombre_empresa.data.get()
-        get_cuit = self.cuit_empresa.data.get()
-        if get_empresa == "" or get_cuit =="":
-            print("Falta cargar datos")
-            self.nombre_empresa.entry.focus()
-        else:
-            self.lista_valores.append([get_empresa,get_cuit,""])
-            self.arbol_de_prueba.write_rows(self.lista_valores)
-            self.clean()
 
 class EmpresaFrame:
     def __init__(self, parent):
@@ -56,10 +18,16 @@ class EmpresaFrame:
 
         self.frame = ttk.LabelFrame(self.parent, text = self.texto, padding=5)
         self.frame.pack(fill = "x")
+        
+        self.frame_info = tk.Frame(self.frame)
+        self.frame_info.grid(row = 0, column = 0, sticky="we", columnspan=2)
+
+        self.info = widgets.InfoFrame(self.frame_info)
+        
         # lista de valores
         self.lista_valores = []
 
-        self.cuit_empresa =widgets.TagsAndEntry(self.frame,"CUIT (con guiones)",0, 0)
+        self.cuit_empresa =widgets.TagsAndEntry(self.frame,"CUIT (con guiones)",5, 0)
         self.nombre_empresa = widgets.TagsAndEntry(self.frame,"nombre de la empresa",10, 0)
         self.register = ttk.Button(self.frame, text ="Registrar empresa", cursor = "hand2", command= self.add_data)
         self.register.grid(row = 50,column = 0, columnspan=2, pady = 5, padx = 5)
@@ -79,11 +47,22 @@ class EmpresaFrame:
         get_cuit = self.cuit_empresa.data.get()
         if get_empresa == "" or get_cuit =="":
             print("Falta cargar datos")
-            self.nombre_empresa.entry.focus()
+            self.cuit_empresa.entry.focus()
         else:
-            self.lista_valores.append([get_cuit,get_empresa,""])
-            self.arbol_de_prueba.write_rows(self.lista_valores)
-            self.clean()
+            try:
+                print("empresa registrada")
+                db.add_empresa(get_cuit, get_empresa)
+                self.lista_valores.append([ get_cuit,get_empresa,""])
+                self.arbol_de_prueba.write_rows(self.lista_valores)
+                self.clean()
+                self.cuit_empresa.entry.focus()
+            except Exception as e:
+                print(f"Hubo un error al intentar cargar la empresa\n{e}")
+                self.cuit_empresa.entry.focus()
+                if e == "UNIQUE constraint failed: empresa.cuit":
+                    self.info.warning("El numero de CUIT ya existe")
+                    print(str(e))
+                    self.cuit_empresa.entry.focus()
 
 class PasoUno:
     def __init__(self, parent):
