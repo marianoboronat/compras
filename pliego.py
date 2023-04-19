@@ -1,7 +1,8 @@
 
 import tkinter as tk
-from tkinter import ttk,filedialog
+from tkinter import ttk,filedialog, messagebox
 import datetime, json
+import os
 
 from docx import Document
 from docx.enum.style import WD_STYLE_TYPE
@@ -70,7 +71,12 @@ class Main:
         }
 
     def clean(self):
-        pass
+        self.detalle.entry.focus()
+        self.dias_entrega.data.set("")
+        self.dias_entrega_letras.data.set("")
+        self.tipo_de_dias.data.set(1)
+        self.especificaciones_tecnicas.data.set(1)
+        
     def get_data(self):
         self.context["ley"] = self.ley.get()
         self.context["anio"] = self.anio.get()
@@ -78,29 +84,24 @@ class Main:
         self.context["detalle"] = self.detalle.get()
         self.context["detalle_mayuscula"] = self.detalle.get().upper()
         self.context["dias_entrega"] = self.dias_entrega.get()
-        self.context["dias_entrega_letra"] = self.dias_entrega_letras.get().upper()
-        self.get_tipo_dia() 
-        self.get_especificaciones_tecnicas()
+        self.context["dias_entrega_letra"] = self.dias_entrega_letras.get()
+        self.context["tipo_de_dias"] = self.get_tipo_dia()
+        self.context["especificaciones_tecnicas"] = self.get_especificaciones_tecnicas()
         
         self.generate_file()
     
 
     def get_especificaciones_tecnicas(self):
         esp_tecnica = self.especificaciones_tecnicas.get()
-        print(esp_tecnica)
-        if esp_tecnica == 1:
-            self.context["especificaciones_tecnicas"] = ""            
-        elif esp_tecnica == 2:
-            self.context["especificaciones_tecnicas"] = "B. ESPECIFICACIONES TÉCNICAS"
+        if esp_tecnica[1] == "si":
+            return "B. Especificaciones Técnicas".upper()
+        else:
+            return ""
 
 
     def get_tipo_dia(self):
         tipo_dia = self.tipo_de_dias.get()
-        print(tipo_dia)
-        if tipo_dia == 1:
-            self.context["tipo_de_dias"] = "hábiles"
-        elif tipo_dia == 2:
-            self.context["tipo_de_dias"] = "corridos"
+        return tipo_dia[1]
 
 
 
@@ -113,9 +114,13 @@ class Main:
             name_path = f"{widgets.open_parameter('path_output')}"
             name_document = f"PLIEGO455CME{self.context['detalle']}.docx"
             document.save(f"{name_path}/{name_document}")
+            
+            os.startfile(f"{name_path}/{name_document}")
             self.info.success(f"El documento '{name_document}' fue creado con exito\nen la carpeta {name_path}")
-        except: 
-            self.info.warning("Error: Hubo un Error al intentar crear el archivo")
+            
+            messagebox.showinfo(message=f"El documento '{name_document}' fue creado con exito\nen la carpeta {name_path}", title="Documento Creado")
+        except Exception as e: 
+            self.info.warning(f"Error: Hubo un Error al intentar crear el archivo\n{e}")
 
 
 

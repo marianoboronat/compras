@@ -30,8 +30,12 @@ class InfoFrame:
         self.frame = tk.Frame(self.parent)
         self.frame.pack(fill="x")
 
-        self.label = tk.Label(self.parent,font = "Calibri 10", text ="")
+        self.label = tk.Label(self.frame,font = "Calibri 10", text ="")
         self.label.pack(fill = "x")
+    
+    def thread(self):
+        pass
+
 
     def warning(self, texto):
         print(f"Peligro: {texto}")
@@ -40,7 +44,7 @@ class InfoFrame:
     def success (self, texto):
         print("")        
         self.frame.config(bg = "#44C190")
-        self.label.config(bg = "#44C190", fg= "white", text =texto)
+        self.label.config(bg = "#44C190", fg= "black", text =texto)
     def info(self, texto):
         print(f"Info: {texto}")
         self.frame.config(bg = "#CDCDCD")
@@ -332,8 +336,9 @@ class FileSelector(TagsAndEntry):
         TagsAndEntry.__init__(self,parent, text_, row_, column_)
 
         self.data.set(open_json("parametros.json")["parametros"][self.parametro])
-        
         self.entry.config(width=47, font = "Calibri 12")
+        self.entry.grid(sticky = "we")
+                
         self.block_button = tk.Button(self.parent, text ="path", command = lambda: self.path(self.parametro))
         self.block_button.grid(column = column_+2,row = row_, padx = 5)
 

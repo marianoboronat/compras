@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk,filedialog
 import datetime, json
+import os
 
 from docx import Document
 from docx.enum.style import WD_STYLE_TYPE

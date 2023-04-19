@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk,filedialog
+from tkinter import ttk,filedialog as fd
 import datetime, json
 
 from docx import Document
@@ -10,32 +10,66 @@ from docxtpl import DocxTemplate
 import widgets, tree, data_base as db
 
 
+
+class Exceles:
+    def __init__(self, parent):
+        #parameters
+        self.parent = parent
+
+        self.frame = ttk.LabelFrame(self.parent, text = "Cargar Exceles")
+        self.frame.pack(fill = "x")
+
+        # self.excel_renglones = fd.askopenfilename()
+
+        self.boton = tk.Button(self.frame, text ="Excel de ", command = self.select_file)
+        self.boton.pack()
+    
+    def select_file(self):
+        filetypes = (
+            ('excel', '*.xlsx')
+        )
+
+        filename = fd.askopenfilename(
+            title='Open a file',
+            initialdir='/',
+            filetypes=filetypes)
+
+        # showinfo(
+        #     title='Selected File',
+        #     message=filename
+        # )
+
+
+        
+    
+    
+
 class EmpresaFrame:
     def __init__(self, parent):
         #parameters
         self.parent = parent
-        self.texto =  "Registrar Empresa"
 
-        self.frame = ttk.LabelFrame(self.parent, text = self.texto, padding=5)
+        self.frame = ttk.LabelFrame(self.parent, text = "Registrar Empresa")
         self.frame.pack(fill = "x")
         
-        self.frame_info = tk.Frame(self.frame)
-        self.frame_info.grid(row = 0, column = 0, sticky="we", columnspan=2)
+        self.frame_info = tk.Frame(self.parent)
+        self.frame_info.pack(fill = "x")
 
         self.info = widgets.InfoFrame(self.frame_info)
-        
+
         # lista de valores
-        self.lista_valores = []
+        self.values_list = {}
 
         self.cuit_empresa =widgets.TagsAndEntry(self.frame,"CUIT (con guiones)",5, 0)
+        self.cuit_empresa.entry.bind("<Return>",lambda x: self.verificar_cuit_existente())
+
         self.nombre_empresa = widgets.TagsAndEntry(self.frame,"nombre de la empresa",10, 0)
         self.register = ttk.Button(self.frame, text ="Registrar empresa", cursor = "hand2", command= self.add_data)
         self.register.grid(row = 50,column = 0, columnspan=2, pady = 5, padx = 5)
         self.register.bind("<Return>",lambda x: self.add_data())
         
-        self.arbol_de_prueba = tree.TreeviewData(self.parent)
-        self.arbol_de_prueba.head([ "CUIT","EMPRESA"])
-        # self.arbol_de_prueba.write_rows([["empresa_1","cuit_1", "renglon_"], ["empresa_2", "cuit_2", "renglon_2"]])
+        self.tree_view = tree.TreeviewData(self.parent)
+        self.tree_view.head({"ID":{"width":20}, "CUIT":{"width":75},"EMPRESA":{"width":250}})
 
     def clean(self):
         self.nombre_empresa.data.set("")
@@ -43,26 +77,65 @@ class EmpresaFrame:
         self.nombre_empresa.entry.focus()
 
     def add_data(self):
+        self.verificar_cuit_existente()
         get_empresa = self.nombre_empresa.data.get()
         get_cuit = self.cuit_empresa.data.get()
+        
         if get_empresa == "" or get_cuit =="":
             print("Falta cargar datos")
             self.cuit_empresa.entry.focus()
         else:
             try:
                 print("empresa registrada")
-                db.add_empresa(get_cuit, get_empresa)
-                self.lista_valores.append([ get_cuit,get_empresa,""])
-                self.arbol_de_prueba.write_rows(self.lista_valores)
+                # empresa registrada
+                set_data = db.add_empresa(get_cuit, get_empresa)
+
+                # consulta de empresa por cuit y almacenado en self.values_list
+                data = db.get_empresa_from_cuit(get_cuit)
+                self.values_list[str(data[0][0])] = data[0]
+                self.tree_view.write_rows(list(self.values_list.values()))
+                         
+                
+                self.cuit_empresa.entry.focus()
+                self.info.success("Empresa registrada")
                 self.clean()
-                self.cuit_empresa.entry.focus()
+
             except Exception as e:
-                print(f"Hubo un error al intentar cargar la empresa\n{e}")
-                self.cuit_empresa.entry.focus()
-                if e == "UNIQUE constraint failed: empresa.cuit":
-                    self.info.warning("El numero de CUIT ya existe")
-                    print(str(e))
+                """si el numero de cuit ya existe que lo agregue a la lista del treeview"""
+                # print(f"Hubo un error al intentar cargar la empresa\n{e}")
+                # self.cuit_empresa.entry.focus()
+                if str(e) == "UNIQUE constraint failed: empresa.cuit":
+                    print(db.get_empresa_from_cuit(get_cuit)[0][0], "hola")
+                    # self.values_list[db.get_empresa_from_cuit(get_cuit)[]] = (db.get_empresa_from_cuit(get_cuit))
+                    # self.verificar_cuit_existente()
+
+    def verificar_cuit_existente(self):
+        """es un evento que al presionar enter primero busca
+        si el cuit ingresado ya existe"""
+        get_cuit = self.cuit_empresa.data.get()
+
+        if get_cuit == "":
+            """si esta vacio que no ocurra nada"""
+            print("se debe ingresar un numero de cuit")
+        else:
+            data = db.get_empresa_from_cuit(get_cuit)
+            print(data)
+            try:
+                if str(data[0][1]) == str(get_cuit):
+                    self.values_list[str(data[0][0])] = data[0]
+                    print("el numero de cuit ya existe", self.values_list)
+                    self.tree_view.write_rows(list(self.values_list.values()))
                     self.cuit_empresa.entry.focus()
+                    
+                    self.info.success(f"Empresa '{data[0][2]}' Agregada")
+                    self.clean()
+            except:
+                self.nombre_empresa.entry.focus()
+                print("cuit no existente :). registrando nueva empresa")
+
+
+            
+
 
 class PasoUno:
     def __init__(self, parent):
@@ -112,8 +185,6 @@ class PasoDos:
 
         self.empresas = EmpresaFrame(self.frame)
 
-
-
 class Main:
     def __init__(self, parent):
         #parameters
@@ -126,7 +197,8 @@ class Main:
         # self.frame = tk.Frame(self.parent)
         # self.frame.pack(fill = "both", expand=1)
 
+
 if __name__== "__main__":
     root = tk.Tk()
-    ventana = Main(root)
+    ventana = Exceles(root)
     root.mainloop()

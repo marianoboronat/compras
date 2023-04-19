@@ -1,0 +1,10 @@
+{
+    "datos":{
+        "1":{
+            "pliego" : 1,
+            "empresa" : "inegho",
+            "oferta" : "900.000",
+            "precio-oferta-letras" : "novecientos mil"
+        }
+    }
+}

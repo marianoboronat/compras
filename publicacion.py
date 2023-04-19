@@ -1,6 +1,7 @@
 
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
+import os
 
 from docx import Document
 from docx.enum.style import WD_STYLE_TYPE
@@ -78,6 +79,7 @@ class Main:
         self.fecha_consulta.data_day.set("")
         self.fecha_consulta.data_month.set("")
         self.fecha_consulta.data_year.set("")
+        self.detalle.entry.focus()
 
     def get_data(self):
         self.context["anio"]=self.anio.get(),
@@ -108,7 +110,11 @@ class Main:
             name_path = f"{widgets.open_parameter('path_output')}"
             name_document = f"PUBLICACION455{self.context['proceso']}CME{self.context['anio_dos_cifras']}.docx"
             document.save(f"{name_path}/{name_document}")
+            #abrir el documento automaticamente
+            os.startfile(f"{name_path}/{name_document}")
             self.info.success(f"El documento '{name_document}' fue creado con exito\nen la carpeta {name_path}")
+            
+            messagebox.showinfo(message=f"El documento '{name_document}' fue creado con exito\nen la carpeta {name_path}", title="Documento Creado")
         
         except: 
             self.info.warning("Error: Hubo un Error al intentar crear el archivo")
