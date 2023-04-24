@@ -13,7 +13,7 @@ def open_json(file):
         main_objeto = json.load(json_file) #LA VARIABLE 'datos' ABRE EL OBJETO JSON DEL ARCHIVO 'json_file'
         return main_objeto
 def open_parameter( parameter):
-    return open_json("parametros.json")["parametros"][f"{parameter}"]
+    return open_json("parametros.json")["parametros"][f'{parameter}']
 
 def save_json(file,parametro, valor): #1er. ARG: EL NOMBRE DE ARCHIVO, 2do ARG: EL DATO QUE ABRE EL OBJETO PARA AGREGAR DATOS
     """escribe datos en el archivo json que se le asigne."""
@@ -22,6 +22,63 @@ def save_json(file,parametro, valor): #1er. ARG: EL NOMBRE DE ARCHIVO, 2do ARG: 
     with open(file, "w") as outfile:
         json.dump(data, outfile, sort_keys = False, indent = 4)
         # outfile["parametros"][f"{parametro}"]
+
+
+class Pagination:
+    def __init__(self, parent, frame_list):
+        #parameters
+        self.parent = parent
+        self.frame_list = frame_list
+
+        self.frame = tk.Frame(self.parent, bg = "#B6B6B6", padx = 5, pady= 5)
+        self.frame.pack(side = "top", fill = "x")
+
+        self.frame_main = tk.Frame(self.parent, bg = "#B6B6B6", padx = 5, pady= 5)
+        self.frame.pack(side = "top", fill = "x")
+
+        self.before_button = tk.Button(self.frame, text ="◄ Anterior", cursor = "hand2", command = self.before_frame)
+        self.before_button.pack(side ="left")
+
+        self.next_button = tk.Button(self.frame, text ="Siguiente ►", cursor = "hand2", command = self.next_frame)
+        self.next_button.pack(side ="left")
+
+        # for frame in self.frame_list:
+        #     frame(self.frame)
+
+        self.hide_frame()
+        self.numero_frame = 0
+        self.frame_list[self.numero_frame].frame.pack(fill="both", expand =1)
+
+
+    def next_frame(self):            
+        try:
+            self.numero_frame += 1
+            if self.numero_frame > len(self.frame_list)-1:
+                self.numero_frame =len(self.frame_list)-1
+            else:
+                self.hide_frame()
+                self.frame_list[self.numero_frame].frame.pack(fill="both", expand =1)
+                print("frame posterior", self.numero_frame)
+        except Exception as e:
+            print(e)
+
+    
+    def before_frame(self):
+        try:
+            self.numero_frame -= 1
+            if self.numero_frame < 0:
+                self.numero_frame =0
+            else:
+                self.hide_frame()
+                self.frame_list[self.numero_frame].frame.pack(fill="both", expand =1)
+                print("frame anterior", self.numero_frame)
+        except Exception as e:
+            print(e)
+
+    def hide_frame(self):
+        for frame in self.frame_list:
+            frame.frame.pack_forget()
+
 
 class InfoFrame:
     def __init__(self, parent):
@@ -61,9 +118,6 @@ class ConfigFrame:
         # self.file_template = PathSelector(self.frame, "Plantilla", 10, 0, "file_template")
         self.file_output = PathSelector(self.frame, "Destino del archivo", 20, 0, "path_output")
 
-
-
-
 class FechaDividido:
     def __init__(self, parent, texto, _row, _column ):
         
@@ -96,6 +150,12 @@ class FechaDividido:
         self.anio_consultas = ttk.Entry(self.frame_main, width=6, font = NORMAL_FONT, textvariable=self.data_year)
         self.anio_consultas.pack(side = "left", pady = 5, padx = 5)
         self.anio_consultas.bind('<Return>', self.button_tab )
+
+    def clean(self):
+        self.data_day.set("")
+        self.data_month.set("")
+        self.data_year.set("")
+
     
     # events
     def focus_entry(self,event):

@@ -44,6 +44,19 @@ def add_empresa(cuit, nombre):
     """
     run_query(data_base,query)
 
+def add_proceso(lista):
+    query = f"""
+    INSERT INTO proceso (numero_proceso, nombre_proceso, expediente, monto_sugerido,
+    monto_sugerido_en_letras, fecha_limite_dia, fecha_limite_mes, fecha_limite_anio,
+    cantidad_firmas_revisadas, anio) 
+
+    VALUES ('{lista["numero_proceso"]}', '{lista["nombre_proceso"]}', '{lista["expediente"]}',
+    '{lista["monto_sugerido"]}', '{lista["monto_sugerido_en_letras"]}', '{lista["fecha_limite_dia"]}',
+    '{lista["fecha_limite_mes"]}','{lista["fecha_limite_anio"]}','{lista["cantidad_firmas_revisadas"]}','{lista["anio"]}')   
+
+    """
+    run_query(data_base,query)
+
 
 
 if __name__ == "__main__":

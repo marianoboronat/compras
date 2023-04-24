@@ -1,5 +1,6 @@
 {
     "parametros": {
+        "anio": 2023,
         "ley": "6.588",
         "file_template": "C:/Users/mariano/Downloads",
         "path_output": "C:/Users/mariano/Desktop",

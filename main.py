@@ -1,30 +1,34 @@
 import tkinter as tk
 from tkinter import ttk,filedialog
 import datetime, json
-import os
+import os, getpass as gt
 
 from docx import Document
 from docx.enum.style import WD_STYLE_TYPE
 from docx.shared import Pt, RGBColor
 
-from docxtpl import DocxTemplate
-import widgets,pliego,publicacion,disposicion_llamado
+from docxtpl import DocxTemplate 
+import widgets,pliego,publicacion,disposicion_llamado, dispocision_adjudicacion as da
 
 class Arbol(ttk.Frame):
     def __init__(self, master, frame_class = None ):
         ttk.Frame.__init__(self, master)
         self.pack(side = "left", fill = tk.BOTH, expand= 1)
-
+        
+        # main frame
         self.frame_left = tk.Frame(self)
         self.frame_left.pack(side = "left", fill = "y", pady = 5, padx=5)
 
         self.frame_right = tk.Frame(self)
         self.frame_right.pack(side = "right", fill = "both", expand = 1, pady = 5, padx=5)
 
+        # options frames 
         self.frame_publicacion = publicacion.Main(self.frame_right)
         self.frame_pliego = pliego.Main(self.frame_right)
         self.disposicion_llamado =  disposicion_llamado.MainWindow(self.frame_right)
+        self.disposicion_adjudicacion = da.Main(self.frame_right)
 
+       
         self.blank_frame = tk.Frame(self.frame_right, width=500,height=500)
         self.blank_frame.pack(fill = "both", expand = 1)
 
@@ -34,13 +38,9 @@ class Arbol(ttk.Frame):
         self.options_dict = {
             "PUBLICACION":self.frame_publicacion,
             "PLIEGO":self.frame_pliego,
-            "DISPOSICION DE LLAMADO":self.disposicion_llamado
+            "DISPOSICION DE LLAMADO":self.disposicion_llamado,
+            "DISPOSICION DE ADJUDICACION": self.disposicion_adjudicacion
             }
-        # lista de nombre de frames que ya fueron seleccionados
-        # en el arbol de opciones para que no vuelva a abrirse
-        self.frames_selected_dicts = {}
-
-        self.contador = 0
 
 
         # arbol de opciones 

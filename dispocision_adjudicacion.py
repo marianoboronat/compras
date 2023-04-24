@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk,filedialog as fd
-import datetime, json
+import datetime, json, os
 
 from docx import Document
 from docx.enum.style import WD_STYLE_TYPE
@@ -21,28 +21,11 @@ class Exceles:
 
         # self.excel_renglones = fd.askopenfilename()
 
-        self.boton = tk.Button(self.frame, text ="Excel de ", command = self.select_file)
+        self.boton = tk.Button(self.frame, text ="Excel de ", command = None)
         self.boton.pack()
     
-    def select_file(self):
-        filetypes = (
-            ('excel', '*.xlsx')
-        )
-
-        filename = fd.askopenfilename(
-            title='Open a file',
-            initialdir='/',
-            filetypes=filetypes)
-
-        # showinfo(
-        #     title='Selected File',
-        #     message=filename
-        # )
-
-
-        
-    
-    
+    def abrir_excel(self):
+        print("abriendo excel") 
 
 class EmpresaFrame:
     def __init__(self, parent):
@@ -133,10 +116,6 @@ class EmpresaFrame:
                 self.nombre_empresa.entry.focus()
                 print("cuit no existente :). registrando nueva empresa")
 
-
-            
-
-
 class PasoUno:
     def __init__(self, parent):
         # parameters
@@ -145,9 +124,20 @@ class PasoUno:
         # frames
         self.frame = ttk.LabelFrame(self.parent,padding=10, text ="Datos Principales" )
         self.frame.pack(fill = "both", expand=1,padx = 10, pady= 10)
+
+        self.frame_info = tk.Frame(self.frame)
+        self.frame_info.grid(column = 0 , row = 0, columnspan=3, sticky="we")
+
+        self.info = widgets.InfoFrame(self.frame_info)
+
+        self.info.info("")
         
         # widgets
-        self.label_expediente = widgets.TagsAndEntry(self.frame, "Numero de expediente", 0,0)
+        self.anio = widgets.TagsAndEntryBlock(self.frame, "Año", 3,0)
+        self.anio.data.set(widgets.open_json("parametros.json")["parametros"]["anio"])
+        self.anio.block_entry()
+
+        self.label_expediente = widgets.TagsAndEntry(self.frame, "Numero de expediente", 5,0)
         self.label_expediente.entry.config(width = 10)
         
         self.nombre_proceso = widgets.TagsAndEntry(self.frame, "Nombre del proceso", 10,0)
@@ -156,7 +146,7 @@ class PasoUno:
         self.numero_proceso = widgets.TagsAndEntry(self.frame, "Numero de proceso", 20,0)
         self.numero_proceso.entry.config(width = 10)
         self.monto_estimado = widgets.TagsAndEntry(self.frame, "Monto estimado\n(en numeros con puntos y coma)", 30,0)
-        self.label_expediente = widgets.TagsAndEntry(self.frame, "Monto estimado(EN LETRAS)", 40,0)
+        self.monto_estimado_letras = widgets.TagsAndEntry(self.frame, "Monto estimado(EN LETRAS)", 40,0)
 
         self.fecha_recepcion = widgets.FechaDividido(self.frame, "Fecha limite de Recepcion de ofertas", 50,0)
         self.fecha_recepcion.frame_main.grid(columnspan=3)
@@ -165,7 +155,53 @@ class PasoUno:
 
         self.cantidad_firmas = widgets.TagsAndEntry(self.frame, "Cantidad de Firmas interesadas", 60,0)
         self.cantidad_firmas.entry.config(width=5)
+        
+        self.submit_button = ttk.Button(self.frame, text ="Agregar Proceso",cursor = "hand2", command = self.add_proceso)
+        self.submit_button.grid(row = 70, column = 0, columnspan=3)
 
+        self.cleaner_button = ttk.Button(self.frame, text ="Limpiar",cursor = "hand2", command = self.clean)
+        self.cleaner_button.grid(row = 80, column = 0, columnspan=3)
+
+    def clean(self):
+        self.numero_proceso.data.set("")
+        self.nombre_proceso.data.set("")
+        self.label_expediente.data.set("")
+        self.monto_estimado.data.set("")
+        self.cantidad_firmas.data.set("")
+
+        self.monto_estimado_letras.data.set("")
+        self.fecha_recepcion.clean()
+
+    def add_proceso(self):
+        context = {
+            "anio":self.anio.data.get(),
+            "numero_proceso": self.numero_proceso.data.get(),
+            "nombre_proceso":self.nombre_proceso.data.get(),
+            "expediente":self.label_expediente.data.get(),
+            "monto_sugerido":self.monto_estimado.data.get(),
+            "monto_sugerido_en_letras":self.monto_estimado_letras.get(),
+            "fecha_limite_dia":self.fecha_recepcion.get()[0],
+            "fecha_limite_mes":self.fecha_recepcion.get()[1],
+            "fecha_limite_anio":self.fecha_recepcion.get()[2],
+            "cantidad_firmas_revisadas":self.cantidad_firmas.data.get()
+            }
+        valid = 0
+        for data in context:
+            print(f"{context[data]}")
+            if context[data] == "":
+                valid += 1
+
+        if valid > 0:
+            self.info.warning(f"error se deben llenar todas las entradas")
+            print("error se deben llenar todas las entradas")
+        else:
+            try:
+                self.info.success(f"se ingreso correctamente")
+                set_data = db.add_proceso(context)
+            except Exception as e:
+                self.info.warning(f"hay un error: {e}")
+                print(f"{e}")
+            
 class PasoDos:
     def __init__(self, parent):
         # parameters
@@ -174,7 +210,7 @@ class PasoDos:
 
         # frames
         self.frame = ttk.LabelFrame(self.parent,padding=10, text ="Datos Principales", width=700)
-        self.frame.pack(fill = "y", padx = 10, pady= 10)
+        self.frame.pack(fill = "both", expand = 1, padx = 10, pady= 10)
 
         self.sub_frame = tk.Frame(self.frame,width=700)
         self.sub_frame.pack(fill = "y")
@@ -190,15 +226,64 @@ class Main:
         #parameters
         self.parent = parent
 
-        #properties
-        self.pasouno = PasoDos(self.parent)
-        # self.empresa_register = EmpresaFrame(self.parent)
+        self.frame = tk.Frame(self.parent)
+        self.frame.pack(side = "top", fill = "x")
+        
+        self.frame_sup = tk.Frame(self.frame, bg = "#B6B6B6", padx = 5, pady= 5)
+        self.frame_sup.pack(side = "top", fill = "x")
 
-        # self.frame = tk.Frame(self.parent)
-        # self.frame.pack(fill = "both", expand=1)
+        self.frame_screen = tk.Frame(self.frame, padx = 5, pady= 5)
+        self.frame_screen.pack(expand= 1,  fill = "both", side = "bottom")
 
+        self.paso_uno = PasoUno(self.frame_screen)
+        self.paso_dos = PasoDos(self.frame_screen)
+        self.paso_tres = Exceles(self.frame_screen)
+        self.frame_list = [self.paso_uno,self.paso_dos , self.paso_tres]
+
+        self.before_button = tk.Button(self.frame_sup, text ="◄ Anterior", cursor = "hand2", command = self.before_frame)
+        self.before_button.pack(side ="left")
+
+        self.next_button = tk.Button(self.frame_sup, text ="Siguiente ►", cursor = "hand2", command = self.next_frame)
+        self.next_button.pack(side ="left")
+
+        self.hide_frame()
+        self.numero_frame = 0
+        self.frame_list[self.numero_frame].frame.pack(fill="both", expand =1)
+
+
+    def next_frame(self):            
+        try:
+            self.numero_frame += 1
+            if self.numero_frame > len(self.frame_list)-1:
+                self.numero_frame =len(self.frame_list)-1
+            else:
+                self.hide_frame()
+                self.frame_list[self.numero_frame].frame.pack(fill="both", expand =1)
+                print("frame posterior", self.numero_frame)
+        except Exception as e:
+            print(e)
+
+    
+    def before_frame(self):
+        try:
+            self.numero_frame -= 1
+            if self.numero_frame < 0:
+                self.numero_frame =0
+            else:
+                self.hide_frame()
+                self.frame_list[self.numero_frame].frame.pack(fill="both", expand =1)
+                print("frame anterior", self.numero_frame)
+        except Exception as e:
+            print(e)
+
+    def hide_frame(self):
+        for frame in self.frame_list:
+            frame.frame.pack_forget()
+            
 
 if __name__== "__main__":
     root = tk.Tk()
-    ventana = Exceles(root)
+    root.geometry("800x500")
+
+    ventana = Main(root )
     root.mainloop()
