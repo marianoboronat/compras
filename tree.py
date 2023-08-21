@@ -2,10 +2,7 @@ import tkinter as tk
 from tkinter import Button, ttk
 from tkinter.constants import NO
 
-# import settings
 import widgets
-# import objects_db as db
-
 
 class TreeviewData():
     def __init__(self, parent):
@@ -23,7 +20,7 @@ class TreeviewData():
 
     def element_clicked(self):
         item = self.tree.focus()
-        print(self.tree.item(item, "values"))
+        # print(self.tree.item(item, "values"))
         return self.tree.item(item, "values")
 
 
@@ -91,6 +88,27 @@ class TreeviewData():
         """cleaning all rows of the treeview"""
         for i in self.tree.get_children():
             self.tree.delete(i)
+    
+
+    def get_multiple_rows(self):
+        """devuelve una lista con los renglones seleccionados"""        
+        select_item = self.tree.selection()
+        print(select_item)
+        list_values = []
+
+        count = 0
+        for value in select_item:
+            info = self.tree.item(select_item[count])    
+            list_values.append(str(info["values"][0]))
+            count +=1
+            
+        print(list_values)
+        return list_values
+
+
+    def get(self):
+        item = self.tree.focus()
+        print(type(item), self.tree.get_children())
 
     def delete_row(self,list_values):
         try:
@@ -189,14 +207,9 @@ class FormFrame:
 
 def verificar_key():
     heading = {
-        "id":{"width":100,
-        },
-        "name":{"width":400,
-                    "anchor":"w"
-        },
-        "lastname":{"width":400,
-                    "anchor":"w"
-        }
+        "id":{"width":100, "anchor":"center"},
+        "name":{"width":400,"anchor":"w"},
+        "lastname":{"width":400,"anchor":"w"}
     }
     keys = list(heading.keys())
     print(keys.index("name"))
@@ -208,4 +221,9 @@ def verificar_key():
 if __name__ == "__main__":
     verificar_key()
     root = tk.Tk()
+    tree = TreeviewData(root)
+    tree.head(heading)
+    tree.write_rows(fake_data)
+
+    getdata = tk.Button(root, text= "get", command = tree.get).pack()
     root.mainloop()

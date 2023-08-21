@@ -1,0 +1,25 @@
+{
+    "anio": "2023",
+    "reparticion_num": "455",
+    "reparticion_siglas": "HGACG",
+    "reparticion": "Hospital General de Agudos Dra. Cecilia Grierson",
+    "director": "Gisella Matta Kloster",
+    "gerente_operativo": "Marcelo Scodellaro",
+    "file_template": "./templates",
+    "path_output": "",
+    "ley": "6.588",
+    "decreto_reglamentario": "129-GCABA/2023",
+    "art_cme": "39",
+    "art_cdi": "29",
+    "art_lpu": "32, primer p\u00e1rrafo del Art\u00edculo 33",
+    "art_informatizacion_contrataciones": "77",
+    "art_seleccion_ofertas": "102",
+    "art_personas_habilitadas": "89",
+    "art_personas_no_habilitadas": "90",
+    "reparticion_nombre": "Hospital General de Agudos Dra. Cecilia Grierson",
+    "tipos_contrataciones":{
+        "CME":"Contratación Menor",
+        "CDI":"Contratación Directa",
+        "LPU":"Licitación Pública"
+    }
+}
